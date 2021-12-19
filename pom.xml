@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>TPT</groupId>
+    <groupId>jaytee31</groupId>
     <artifactId>daily-deal</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>DailyDealer6000</name>
     <description>The DailyDealer6000 shows the daily menus of restaurants</description>
 
@@ -33,19 +33,24 @@
     </developers>
 
     <properties>
+        <!-- Configuration -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reportingoutputEncoding>UTF-8</project.reportingoutputEncoding>
+        <exec.mainClass>jaytee31.daily.deal.Application</exec.mainClass>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <exec.mainClass>daily.deal.Application</exec.mainClass>
-        <jsoup.version>1.14.3</jsoup.version>
-        <logback.version>1.2.8</logback.version>
-        <junit.version>5.8.2</junit.version>
-        <shade-plugin.version>3.2.4</shade-plugin.version>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+
+        <!-- Dependency Versions -->
         <jacoco.version>0.8.7</jacoco.version>
+        <jsoup.version>1.14.3</jsoup.version>
+        <junit.version>5.8.2</junit.version>
+        <logback.version>1.2.8</logback.version>
+
+        <!-- Plugin Versions -->
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <shade-plugin.version>3.2.4</shade-plugin.version>
+        <surefire-plugin.version>2.22.2</surefire-plugin.version>
     </properties>
 
     <dependencies>
