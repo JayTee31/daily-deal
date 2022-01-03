@@ -1,4 +1,4 @@
-package jaytee31.daily.deal.menu.specificmenus;
+package jaytee31.daily.deal.melange.menu;
 
 public class MelangeDailyMenu {
     private final String soup;

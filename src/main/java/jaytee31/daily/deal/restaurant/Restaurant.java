@@ -1,4 +1,4 @@
-package jaytee31.daily.deal.restaurants;
+package jaytee31.daily.deal.restaurant;
 
 import jaytee31.daily.deal.date.CurrentTime;
 import jaytee31.daily.deal.menu.DailyMenu;

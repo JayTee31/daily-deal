@@ -12,7 +12,7 @@ public class DailyMenu<T> {
         this.currentTime = currentTime;
         this.restaurantName = restaurantName;
         this.menu = menu;
-        status = DailyMenuStatus.AVAILABLE;
+        this.status = dailyMenuStatus;
     }
 
     @Override
@@ -20,16 +20,17 @@ public class DailyMenu<T> {
         String result = "The daily menu in: " + restaurantName +
                 " at " + currentTime + "\n";
 
-        if (status.equals(DailyMenuStatus.AVAILABLE)) {
-            return result + menu;
-        } else if (status.equals(DailyMenuStatus.HOLIDAY)) {
-            return result + " is not available on holiday.";
-        } else if (status.equals(DailyMenuStatus.RESTAURANT_CLOSED)) {
-            return result + " is not available since the restaurant is closed.";
-        } else if (status.equals(DailyMenuStatus.MISSING_FOR_UNKNOWN_REASON)) {
-            return result + " is not available for unknown reasons";
-        } else {
-            throw new IllegalStateException("DailyMenuStatus is missing");
+        switch (status) {
+            case AVAILABLE:
+                return result + menu;
+            case HOLIDAY:
+                return result + " is not available on holiday.";
+            case RESTAURANT_CLOSED:
+                return result + " is not available since the restaurant is closed.";
+            case MISSING_FOR_UNKNOWN_REASON:
+                return result + " is not available for unknown reasons";
+            default:
+                return "DailyMenuStatus is missing";
         }
     }
 

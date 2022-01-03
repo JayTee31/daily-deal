@@ -1,32 +1,40 @@
-package jaytee31.daily.deal.restaurants.melange;
+package jaytee31.daily.deal.melange.restaurant;
 
 import jaytee31.daily.deal.date.CurrentTime;
 import jaytee31.daily.deal.date.Day;
+import jaytee31.daily.deal.melange.menu.MelangeDailyMenu;
 import jaytee31.daily.deal.menu.DailyMenu;
 import jaytee31.daily.deal.menu.DailyMenuStatus;
-import jaytee31.daily.deal.menu.specificmenus.MelangeDailyMenu;
-import jaytee31.daily.deal.restaurants.Restaurant;
+import jaytee31.daily.deal.restaurant.Restaurant;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Melange implements Restaurant<MelangeDailyMenu> {
     private final static String RESTAURANT_NAME = "Melange";
     private final static String URL = "https://melangekavehaz.hu/en/gastronomy-home/";
     private final static Logger LOGGER = LoggerFactory.getLogger(Melange.class);
-    private final String allInformation;
-    private DailyMenuStatus status;
 
     public Melange() {
-        allInformation = extractInformationFromSite();
-        status = DailyMenuStatus.AVAILABLE;
         LOGGER.info("New instance was created.");
     }
 
     @Override
     public DailyMenu<MelangeDailyMenu> getDailyMenu(final CurrentTime currentTime) {
-        MelangeDailyMenu melangeMenu = new MelangeDailyMenu(extractSoup(currentTime), extractCourseA(currentTime), extractCourseB(currentTime), extractPrice());
+        final String allInformation = extractInformationFromSite();
+        final DailyMenuStatus status = extractStatusFromInformation(allInformation, currentTime);
+
+        if (!status.equals(DailyMenuStatus.AVAILABLE)) {
+            return new DailyMenu<>(currentTime, RESTAURANT_NAME, status, null);
+        }
+
+        MelangeDailyMenu melangeMenu = new MelangeDailyMenu(
+                extractSoup(allInformation, currentTime),
+                extractCourseA(allInformation, currentTime),
+                extractCourseB(allInformation, currentTime),
+                extractPrice(allInformation));
 
         return new DailyMenu<>(currentTime, RESTAURANT_NAME, status, melangeMenu);
     }
@@ -40,31 +48,32 @@ public class Melange implements Restaurant<MelangeDailyMenu> {
             LOGGER.info("Extracting information from site.");
             LOGGER.debug("Extracting information from element: {}, and converting to text: {}.", selector, information);
         } catch (IOException e) {
-            status = DailyMenuStatus.MISSING_FOR_UNKNOWN_REASON;
             LOGGER.warn("Could not download information from the site.");
-            return "";
         }
 
         return information;
     }
 
-    private String extractDay(final CurrentTime currentTime) {
-        if (!status.equals(DailyMenuStatus.AVAILABLE)) {
-            return "";
+    private DailyMenuStatus extractStatusFromInformation(final String information, final CurrentTime currentTime) {
+        if (Objects.isNull(information)) {
+            return DailyMenuStatus.MISSING_FOR_UNKNOWN_REASON;
+        } else if (information.isEmpty()) {
+            return DailyMenuStatus.HOLIDAY;
+        } else if (currentTime.getNumberOfDayOfWeek() > 5) {
+            return DailyMenuStatus.RESTAURANT_CLOSED;
         }
 
-        if (currentTime.getNumberOfDayOfWeek() > 5) {
-            status = DailyMenuStatus.RESTAURANT_CLOSED;
-            return "";
-        }
+        return DailyMenuStatus.AVAILABLE;
+    }
 
+    private String extractDay(final String allInformation, final CurrentTime currentTime) {
         final String nextDay = Day.getHungarianName(currentTime.getNextDaysName());
 
         final int startIndex = allInformation.indexOf(currentTime.getHungarianDayName());
         int endIndex = 0;
 
         if (currentTime.getNameOfDay().equals(Day.FRIDAY.name())) {
-            endIndex = allInformation.indexOf(extractPrice());
+            endIndex = allInformation.indexOf(extractPrice(allInformation));
         } else {
             endIndex = allInformation.indexOf(nextDay);
         }
@@ -72,29 +81,21 @@ public class Melange implements Restaurant<MelangeDailyMenu> {
         return allInformation.substring(startIndex, endIndex);
     }
 
-    private String extractSoup(final CurrentTime currentTime) {
-        if (!status.equals(DailyMenuStatus.AVAILABLE)) {
-            return "";
-        }
-
-        final String dailyInformation = extractDay(currentTime);
+    private String extractSoup(final String allInformation, final CurrentTime currentTime) {
+        final String dailyInformation = extractDay(allInformation, currentTime);
         final int startIndex = dailyInformation.indexOf(currentTime.getHungarianDayName()) + currentTime.getHungarianDayName().length();
         final int endIndex = dailyInformation.indexOf("„A\"");
 
         return dailyInformation.substring(startIndex, endIndex);
     }
 
-    private String extractCourseA(final CurrentTime currentTime) {
-        if (!status.equals(DailyMenuStatus.AVAILABLE)) {
-            return "";
-        }
-
-        final String dailyInformation = extractDay(currentTime);
+    private String extractCourseA(final String allInformation, final CurrentTime currentTime) {
+        final String dailyInformation = extractDay(allInformation, currentTime);
         final int startIndex = dailyInformation.indexOf("„A\"") + "„A\"".length() + 1;
         int endIndex = dailyInformation.indexOf("„B\"");
 
         if (!dailyInformation.contains("„A\"")) {
-            return "A course is not exist.";
+            return "A course does not exist.";
         }
 
         if (!dailyInformation.contains("„B\"")) {
@@ -104,40 +105,22 @@ public class Melange implements Restaurant<MelangeDailyMenu> {
         return dailyInformation.substring(startIndex, endIndex);
     }
 
-    private String extractCourseB(final CurrentTime currentTime) {
-        if (!status.equals(DailyMenuStatus.AVAILABLE)) {
-            return "";
-        }
-
-        final String dailyInformation = extractDay(currentTime);
+    private String extractCourseB(final String allInformation, final CurrentTime currentTime) {
+        final String dailyInformation = extractDay(allInformation, currentTime);
         final int startIndex = dailyInformation.indexOf("„B\"") + "„B\"".length() + 1;
         int endIndex = dailyInformation.length();
 
         if (!dailyInformation.contains("„B\"")) {
-            return "B course is not exist.";
+            return "B course does not exist.";
         }
 
         return dailyInformation.substring(startIndex, endIndex);
     }
 
+    private String extractPrice(final String allInformation) {
+        final int startIndex = allInformation.indexOf("Helyben fogyasztva");
+        final int endIndex = allInformation.indexOf("Megrendelés");
 
-    private String extractPrice() {
-        if (!status.equals(DailyMenuStatus.AVAILABLE)) {
-            return "";
-        }
-
-        final String selector = "#hetimenu > div > div > div > div > div:nth-child(7) > div > div > div.wpb_text_column.wpb_content_element > div";
-        String price = "";
-
-        try {
-            price = Jsoup.connect(URL).get().select(selector).text();
-            LOGGER.info("Extracting price from site.");
-            LOGGER.debug("Extracting information from element: {}, and converting to text: {}", selector, price);
-        } catch (IOException e) {
-            LOGGER.warn("Could not download the site.");
-            status = DailyMenuStatus.MISSING_FOR_UNKNOWN_REASON;
-        }
-
-        return price;
+        return allInformation.substring(startIndex, endIndex);
     }
 }
