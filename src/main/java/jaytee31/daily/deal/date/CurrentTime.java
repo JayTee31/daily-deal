@@ -2,30 +2,23 @@ package jaytee31.daily.deal.date;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
 
 public class CurrentTime {
-    private String year;
-    private String month;
-    private String day;
-
-    public CurrentTime(final String year, final String month, final String day) {
-        this.year = year;
-        this.month = month.toUpperCase();
-        this.day = day.toUpperCase();
-    }
-
-    public CurrentTime(final int day) {
-        this(String.valueOf(LocalDateTime.now().getYear()), LocalDateTime.now().getMonth().name(), DayOfWeek.of(day).name());
-    }
+    private final int year;
+    private final int month;
+    private final int dayOfMonth;
+    private final String nameOfDay;
 
     public CurrentTime() {
-        this(String.valueOf(LocalDateTime.now().getYear()), LocalDateTime.now().getMonth().name(), LocalDateTime.now().getDayOfWeek().name());
+        year = LocalDateTime.now().getYear();
+        month = LocalDateTime.now().getMonthValue();
+        dayOfMonth = LocalDateTime.now().getDayOfMonth();
+        nameOfDay = LocalDateTime.now().getDayOfWeek().name();
     }
 
-    public int getNumberOfDay() {
+    public int getNumberOfDayOfWeek() {
         for (Day day : Day.values()) {
-            if (this.day.equals(day.name())) {
+            if (this.nameOfDay.equals(day.name())) {
                 return day.getNumberOfDay();
             }
         }
@@ -35,7 +28,7 @@ public class CurrentTime {
 
     public String getHungarianDayName() {
         for (Day day : Day.values()) {
-            if (this.day.equals(day.name())) {
+            if (this.nameOfDay.equals(day.name())) {
                 return day.getHungarianName();
             }
         }
@@ -43,34 +36,30 @@ public class CurrentTime {
         throw new IllegalArgumentException();
     }
 
-    public String getYear() {
+    public String getNextDaysName() {
+        return LocalDateTime.now().withDayOfMonth(dayOfMonth + 1).getDayOfWeek().name();
+    }
+
+    public int getYear() {
         return year;
     }
 
-    public void setYear(String year) {
-        this.year = year;
-    }
-
-    public String getMonth() {
+    public int getMonth() {
         return month;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
+    public int getDayOfMonth() {
+        return dayOfMonth;
     }
 
-    public String getDay() {
-        return day;
-    }
-
-    public void setDay(String day) {
-        this.day = day;
+    public String getNameOfDay() {
+        return nameOfDay;
     }
 
     @Override
     public String toString() {
         return year + "/" +
                 month + "/" +
-                day;
+                dayOfMonth;
     }
 }

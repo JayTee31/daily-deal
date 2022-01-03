@@ -53,20 +53,20 @@ public class Melange implements Restaurant<MelangeDailyMenu> {
             return "";
         }
 
-        if (currentTime.getNumberOfDay() > 5) {
+        if (currentTime.getNumberOfDayOfWeek() > 5) {
             status = DailyMenuStatus.RESTAURANT_CLOSED;
             return "";
         }
 
-        final CurrentTime nextDay = new CurrentTime(currentTime.getNumberOfDay() + 1);
+        final String nextDay = Day.getHungarianName(currentTime.getNextDaysName());
 
         final int startIndex = allInformation.indexOf(currentTime.getHungarianDayName());
         int endIndex = 0;
 
-        if (currentTime.getDay().equals(Day.FRIDAY.name())) {
+        if (currentTime.getNameOfDay().equals(Day.FRIDAY.name())) {
             endIndex = allInformation.indexOf(extractPrice());
         } else {
-            endIndex = allInformation.indexOf(nextDay.getHungarianDayName());
+            endIndex = allInformation.indexOf(nextDay);
         }
 
         return allInformation.substring(startIndex, endIndex);

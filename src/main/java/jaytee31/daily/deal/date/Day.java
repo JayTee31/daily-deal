@@ -17,6 +17,16 @@ public enum Day {
         this.hungarianName = hungarianName;
     }
 
+    public static String getHungarianName(final String name) {
+        for (Day day : Day.values()) {
+            if (day.name().equals(name.toUpperCase())) {
+                return day.getHungarianName();
+            }
+        }
+
+        throw new IllegalArgumentException();
+        }
+
     public String getHungarianName() {
         return hungarianName;
     }
