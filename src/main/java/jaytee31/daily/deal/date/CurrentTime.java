@@ -1,6 +1,5 @@
 package jaytee31.daily.deal.date;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 public class CurrentTime {
@@ -10,10 +9,14 @@ public class CurrentTime {
     private final String nameOfDay;
 
     public CurrentTime() {
-        year = LocalDateTime.now().getYear();
-        month = LocalDateTime.now().getMonthValue();
-        dayOfMonth = LocalDateTime.now().getDayOfMonth();
-        nameOfDay = LocalDateTime.now().getDayOfWeek().name();
+        this(LocalDateTime.now());
+    }
+
+    public CurrentTime(final LocalDateTime localDateTime) {
+        year = localDateTime.getYear();
+        month = localDateTime.getMonthValue();
+        dayOfMonth = localDateTime.getDayOfMonth();
+        nameOfDay = localDateTime.getDayOfWeek().name();
     }
 
     public int getNumberOfDayOfWeek() {

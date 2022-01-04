@@ -2,22 +2,27 @@ package jaytee31.daily.deal.melange.restaurant;
 
 import jaytee31.daily.deal.date.CurrentTime;
 import jaytee31.daily.deal.date.Day;
+import jaytee31.daily.deal.download.PageDownloader;
 import jaytee31.daily.deal.melange.menu.MelangeDailyMenu;
 import jaytee31.daily.deal.menu.DailyMenu;
 import jaytee31.daily.deal.menu.DailyMenuStatus;
 import jaytee31.daily.deal.restaurant.Restaurant;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Objects;
 
 public class Melange implements Restaurant<MelangeDailyMenu> {
-    private final static String RESTAURANT_NAME = "Melange";
+    public final static String RESTAURANT_NAME = "Melange";
     private final static String URL = "https://melangekavehaz.hu/en/gastronomy-home/";
     private final static Logger LOGGER = LoggerFactory.getLogger(Melange.class);
 
-    public Melange() {
+    private final PageDownloader pageDownloader;
+
+    public Melange(PageDownloader pageDownloader) {
+        this.pageDownloader = pageDownloader;
         LOGGER.info("New instance was created.");
     }
 
@@ -42,9 +47,10 @@ public class Melange implements Restaurant<MelangeDailyMenu> {
     private String extractInformationFromSite() {
         final String selector = "#hetimenu";
         String information = "";
-
         try {
-            information = Jsoup.connect(URL).get().select(selector).text();
+            final String pageSource = pageDownloader.downloadPage(URL);
+            final Document document = Jsoup.parse(pageSource);
+            information = document.select(selector).text();
             LOGGER.info("Extracting information from site.");
             LOGGER.debug("Extracting information from element: {}, and converting to text: {}.", selector, information);
         } catch (IOException e) {
