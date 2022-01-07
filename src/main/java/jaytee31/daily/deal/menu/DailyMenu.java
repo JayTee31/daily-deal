@@ -2,6 +2,8 @@ package jaytee31.daily.deal.menu;
 
 import jaytee31.daily.deal.date.CurrentTime;
 
+import java.util.Objects;
+
 public class DailyMenu<T> {
     private final CurrentTime currentTime;
     private final String restaurantName;
@@ -44,5 +46,18 @@ public class DailyMenu<T> {
 
     public T getMenu() {
         return menu;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DailyMenu<?> dailyMenu = (DailyMenu<?>) o;
+        return Objects.equals(currentTime, dailyMenu.currentTime) && Objects.equals(restaurantName, dailyMenu.restaurantName) && status == dailyMenu.status && Objects.equals(menu, dailyMenu.menu);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTime, restaurantName, status, menu);
     }
 }

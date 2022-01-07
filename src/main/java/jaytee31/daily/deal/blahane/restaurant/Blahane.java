@@ -2,10 +2,12 @@ package jaytee31.daily.deal.blahane.restaurant;
 
 import jaytee31.daily.deal.blahane.menu.BlahaneDailyMenu;
 import jaytee31.daily.deal.date.CurrentTime;
+import jaytee31.daily.deal.download.PageDownloader;
 import jaytee31.daily.deal.menu.DailyMenu;
 import jaytee31.daily.deal.menu.DailyMenuStatus;
 import jaytee31.daily.deal.restaurant.Restaurant;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -16,7 +18,10 @@ public class Blahane implements Restaurant<BlahaneDailyMenu> {
     private final static String URL = "http://www.menurendeles.hu/";
     private final static Logger LOGGER = LoggerFactory.getLogger(Blahane.class);
 
-    public Blahane() {
+    private final PageDownloader pageDownloader;
+
+    public Blahane(final PageDownloader pageDownloader) {
+        this.pageDownloader = pageDownloader;
         LOGGER.info("New instance was created.");
     }
 
@@ -46,7 +51,9 @@ public class Blahane implements Restaurant<BlahaneDailyMenu> {
         String information = "";
 
         try {
-            information = Jsoup.connect(URL).get().select(selector).text();
+            final String pageSource = pageDownloader.downloadPage(URL);
+            final Document document = Jsoup.parse(pageSource);
+            information = document.select(selector).text();
             LOGGER.info("Extracting information from site.");
             LOGGER.debug("Extracting information from element: {}, and converting to text: {}.", selector, information);
         } catch (IOException e) {
@@ -61,7 +68,9 @@ public class Blahane implements Restaurant<BlahaneDailyMenu> {
         String soups = "";
 
         try {
-            soups = Jsoup.connect(URL).get().select(selector).text();
+            final String pageSource = pageDownloader.downloadPage(URL);
+            final Document document = Jsoup.parse(pageSource);
+            soups = document.select(selector).text();
             LOGGER.info("Extracting soups from site.");
             LOGGER.debug("Extracting soups from element: {}, and converting to text: {}.", selector, soups);
         } catch (IOException e) {
@@ -108,7 +117,9 @@ public class Blahane implements Restaurant<BlahaneDailyMenu> {
         String price = "";
 
         try {
-            price = Jsoup.connect(URL).get().select(selector).text();
+            final String pageSource = pageDownloader.downloadPage(URL);
+            final Document document = Jsoup.parse(pageSource);
+            price = document.select(selector).text();
             LOGGER.info("Extracting price from site.");
             LOGGER.debug("Extracting price from element: {}, and converting to text: {}.", selector, price);
         } catch (IOException e) {
